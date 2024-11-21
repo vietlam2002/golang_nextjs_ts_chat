@@ -44,6 +44,11 @@ const index = () => {
 
     }
 
+    // Điều hướng đến trang đăng kí
+    const navigateToSignUp = () => {
+        router.push('/signup')
+    }
+
     return (
         <div className='flex items-center justify-center min-w-full min-h-screen'>
             <form className='flex flex-col md:w-1/5'>
@@ -66,7 +71,11 @@ const index = () => {
                 <button className='p-3 mt-6 rounded-md bg-blue font-bold text-white' type='submit' onClick={submitHandler}>
                     Login
                 </button>
-                <button className='p-3 mt-6 font-bold text-black' type='button'>
+                <button
+                    className='p-3 mt-6 font-bold text-black'
+                    type='button'
+                    onClick={navigateToSignUp} // Gọi hàm điều hướng đến trang signup
+                >
                     Don't have an account? <span className='text-blue'>Sign up</span>
                 </button>
             </form>
