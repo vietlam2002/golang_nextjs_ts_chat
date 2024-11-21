@@ -1,6 +1,7 @@
 package router
 
 import (
+	"server/internal/upload"
 	"server/internal/user"
 	"server/internal/ws"
 	"time"
@@ -11,7 +12,7 @@ import (
 
 var r *gin.Engine
 
-func InitRouter(userHandler *user.Handler, wsHandler *ws.Handler) {
+func InitRouter(userHandler *user.Handler, wsHandler *ws.Handler, uploadHandler *upload.Handler) {
 	r = gin.Default()
 
 	r.Use(cors.New(cors.Config{
@@ -34,6 +35,10 @@ func InitRouter(userHandler *user.Handler, wsHandler *ws.Handler) {
 	r.GET("/ws/joinRoom/:roomId", wsHandler.JoinRoom)
 	r.GET("/ws/getRooms", wsHandler.GetRooms)
 	r.GET("/ws/getClients/:roomId", wsHandler.GetClients)
+
+	// Thêm con trỏ uploadHandler *upload.Handler trong hàm InitRouter
+	// Them router xử lí upload file
+	r.POST("/upload", uploadHandler.UploadFile)
 }
 
 func Start(addr string) error {

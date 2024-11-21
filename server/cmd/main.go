@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"server/db"
+	"server/internal/upload"
 	"server/internal/user"
 	"server/internal/ws"
 	"server/router"
@@ -27,6 +28,10 @@ func main() {
 	wsHandler := ws.NewHandler(hub)
 	go hub.Run()
 
-	router.InitRouter(userHandler, wsHandler)
+	// Khởi tạo module upload
+	uploadService := upload.NewService() // Nếu cần, bạn có thể truyền thêm tham số cấu hình vào đây
+	uploadHandler := upload.NewHandler(uploadService)
+
+	router.InitRouter(userHandler, wsHandler, uploadHandler) //Thêm upload.NewHandler
 	router.Start("0.0.0.0:5000")
 }
