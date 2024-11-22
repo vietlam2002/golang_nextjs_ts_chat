@@ -15,13 +15,14 @@ func NewHandler(service *Service) *Handler {
 }
 
 func (h *Handler) UploadFile(c *gin.Context) {
+	// Lấy file từ request
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve file"})
 		return
 	}
 
-	// Lưu file lên MinIO
+	// Gọi service để upload file lên MinIO
 	fileURL, err := h.service.UploadToMinio(file)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file"})

@@ -15,9 +15,12 @@ type Client struct {
 }
 
 type Message struct {
-	Content  string `json:"content"`
-	RoomID   string `json:"roomId"`
-	Username string `json:"username"`
+	Content  string `json:"content"`  // Tin nhan van ban
+	RoomID   string `json:"roomId"`   // phong chat
+	Username string `json:"username"` // Nguoi gui
+	FileURL  string `json:"fileUrl"`  // URL file dinh kem
+	FileName string `json:"fileName"` // Ten File
+	IsFile   bool   `json:"File"`     // Danh dau neu day la file
 }
 
 func (c *Client) writeMessage() {
@@ -31,7 +34,16 @@ func (c *Client) writeMessage() {
 			return
 		}
 
-		c.Conn.WriteJSON(message)
+		// c.Conn.WriteJSON(message) // code cũ
+
+		//------------------------------------------------------
+		// Gửi tin nhắn dưới dạng JSON
+		err := c.Conn.WriteJSON(message)
+		if err != nil {
+			log.Printf("Error sending message: %v", err)
+			return
+		}
+		// ----------------------------------------------------
 	}
 }
 
@@ -50,11 +62,13 @@ func (c *Client) readMessage(hub *Hub) {
 			break
 		}
 
+		// -------code cũ
 		msg := &Message{
 			Content:  string(m),
 			RoomID:   c.RoomID,
 			Username: c.Username,
 		}
+		// --------- code mới
 
 		hub.Broadcast <- msg
 	}

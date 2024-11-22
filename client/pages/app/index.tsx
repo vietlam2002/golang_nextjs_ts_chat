@@ -7,11 +7,12 @@ import autosize from 'autosize'
 import { AuthContext } from '../../modules/auth_provider'
 
 export type Message = {
-    content: string
-    client_id: string
-    username: string
-    room_id: string
-    type: 'recv' | 'self'
+    content: string;
+    client_id: string;
+    username: string;
+    room_id: string;
+    type: 'recv' | 'self' | 'file';
+    fileUrl?: string;
 }
 
 const index = () => {
@@ -22,6 +23,61 @@ const index = () => {
     const { user } = useContext(AuthContext)
 
     const router = useRouter()
+
+    // ----------------------------Moi them-------------------------------------
+    // Them fileinputref 
+
+    // Xu li hanh dong click icon "dinh kem" và mở hộp thoại chọn file
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const handleOpenFileInput = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+
+    };
+
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!event.target.files || event.target.files.length === 0) return;
+
+        const file = event.target.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await fetch(`${API_URL}/upload`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (res.ok) {
+                const result = await res.json();
+                console.log("File uploaded successfully:", result);
+                // const fileURL = result.fileURL; //URL trả về từ sẻver
+
+                // Xử lý sau khi upload (gửi thông tin file qua WebSocket)
+                if (conn) {
+                    const message = {
+                        username: user?.username || "Anonymous",
+                        client_id: user?.id || "Anonymous", // Nếu user có id
+                        roomId: conn.url.split('/')[5],
+                        fileUrl: result.url, // Đường dẫn file trả về từ server
+                        fileName: file.name,
+                        isFile: true, // Đánh dấu đây là tin nhắn file
+                        type: 'file',
+                        content: `${file.name} has been uploaded.`,
+                    };
+                    conn.send(JSON.stringify(message));
+                }
+
+            } else {
+                console.error("Failed to upload file:", res.statusText);
+            }
+        } catch (error) {
+            console.error("Error uploading file:", error)
+        }
+    };
+
+    //-------------------------------------------------------------------------
 
     useEffect(() => {
         if (conn === null) {
@@ -57,7 +113,16 @@ const index = () => {
         }
 
         conn.onmessage = (message) => {
-            const m: Message = JSON.parse(message.data)
+            const m: Message = JSON.parse(message.data);
+
+            // ----------------------------------------------------------------------------------
+            // Xử lí tin nhắn là file
+            if (m.type === "file") {
+                m.content = `<a href="${m.content}" target="_blank" class="text-blue-500 underline">
+                                ${m.content.endsWith(".pdf") ? "📄 View PDF" : "🖼️ View Image"}
+                             </a>`;
+            }
+            // --------------------------------------------------------------------------
             if (m.content == 'A new user has joined the room') {
                 setUsers([...users, { username: m.username }])
             }
@@ -106,6 +171,20 @@ const index = () => {
                             />
                         </div>
                         <div className='flex items-center'>
+                            {/* Nút dinh kem file*/}
+                            <button
+                                className='p-2 rounded-md bg-gray-400 text-white mr-2'
+                                onClick={handleOpenFileInput}
+                            >
+                                📎
+                            </button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                onChange={handleFileUpload}
+                            />
+                            {/* Nut gui tin nhan */}
                             <button
                                 className='p-2 rounded-md bg-blue text-white'
                                 onClick={sendMessage}
