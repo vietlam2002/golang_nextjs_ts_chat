@@ -57,16 +57,17 @@ const index = () => {
                 // Xử lý sau khi upload (gửi thông tin file qua WebSocket)
                 if (conn) {
                     const message = {
-                        username: user?.username || "Anonymous",
-                        client_id: user?.id || "Anonymous", // Nếu user có id
-                        roomId: conn.url.split('/')[5],
-                        fileUrl: result.url, // Đường dẫn file trả về từ server
-                        fileName: file.name,
-                        isFile: true, // Đánh dấu đây là tin nhắn file
-                        type: 'file',
                         content: `${file.name} has been uploaded.`,
+                        client_id: user?.id || "Anonymous", // Nếu user có id
+                        username: user?.username || "Anonymous",
+                        room_id: conn.url.split('/')[5],
+                        type: 'file',
+                        fileUrl: result.url, // Đường dẫn file trả về từ server
+                        // fileName: file.name,
+                        // isFile: true, // Đánh dấu đây là tin nhắn file
+                        
                     };
-                    conn.send(JSON.stringify(message));
+                    conn.send(JSON.stringify(message.fileUrl));
                 }
 
             } else {
@@ -117,11 +118,11 @@ const index = () => {
 
             // ----------------------------------------------------------------------------------
             // Xử lí tin nhắn là file
-            if (m.type === "file") {
-                m.content = `<a href="${m.content}" target="_blank" class="text-blue-500 underline">
-                                ${m.content.endsWith(".pdf") ? "📄 View PDF" : "🖼️ View Image"}
-                             </a>`;
-            }
+            // if (m.type === "file") {
+            //     m.content = `<a href="${m.content}" target="_blank" class="text-blue-500 underline">
+            //                     ${m.content.endsWith(".pdf") ? "📄 View PDF" : "🖼️ View Image"}
+            //                  </a>`;
+            // }
             // --------------------------------------------------------------------------
             if (m.content == 'A new user has joined the room') {
                 setUsers([...users, { username: m.username }])
