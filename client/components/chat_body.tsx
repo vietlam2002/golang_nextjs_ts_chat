@@ -146,6 +146,19 @@ const ChatBody = ({ data }: { data: Array<Message> }) => {
                                                     📄 View PDF
                                                 </a></>
                                     
+                                    ) : message.content.replace(/^"|"$/g, '')?.match(/\.(go|txt|py|tsx|cpp|csv)$/) ? (
+                                        <><iframe
+                                                src={message.content.replace(/^"|"$/g, '')}
+                                                width="100%"
+                                                height="300px"
+                                                typeof="application/pdf" /><a
+                                                    href={message.content.replace(/^"|"$/g, '')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-500 underline"
+                                                >
+                                                    📄 View file
+                                                </a></>
                                     ) : (
                                         message.content
                                     )}

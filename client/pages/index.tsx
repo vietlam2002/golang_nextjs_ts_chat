@@ -11,6 +11,7 @@ const index = () => {
   const [roomName, setRoomName] = useState('')
   const { user } = useContext(AuthContext)
   const { setConn } = useContext(WebsocketContext)
+  const [errorMessage, setErrorMessage] = useState('');
 
   const router = useRouter()
 
@@ -67,9 +68,49 @@ const index = () => {
     }
   }
 
+  const logoutHandler = async (e: React.SyntheticEvent) => {
+      e.preventDefault()
+
+      try {
+        const res = await fetch(`${API_URL}/logout`, {
+            method: 'GET',
+            // headers: { 'Content-Type': 'application/json' },
+            // body: JSON.stringify({ username, email, password }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log('Logout Success: ', data);
+
+          // Xoá token hoặc session
+          localStorage.removeItem('token'); // Nếu bạn dùng localStorage
+          sessionStorage.removeItem('token'); // Nếu bạn dùng sessionStorage
+          router.push('/login')
+
+        } else {
+          const errorData = await res.json();
+          setErrorMessage(errorData.message || 'Logout failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error during log-out:', error);
+        setErrorMessage('Something went wrong. Please try again later.');
+      }
+  }
+
   return (
     <>
       <div className='my-8 px-4 md:mx-32 w-full h-full'>
+        {/** Header voi nut logout */}
+        <div className='flex justufy-between items-center p-5'>
+          {/* <div className='font-bold text-xl'>Chat Application</div> */}
+          <button
+            className='absolute top-5 right-5 bg-blue border text-white rounded-md p-2 md:ml-4'
+            type='submit'
+            onClick={logoutHandler}
+          >
+            Logout
+          </button>
+        </div>
         <div className='flex justify-center mt-3 p-5'>
           <input
             type='text'
