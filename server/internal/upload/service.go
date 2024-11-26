@@ -17,8 +17,10 @@ type Service struct {
 
 func NewService() *Service {
 	endpoint := "localhost:9000"
-	accessKeyID := "e8NJMe7BHLQDCZZuWzjS"
-	secretAccessKey := "MXvyXoJVxj7FyVfDttgo83vIeIZnY1IR2mEP3D8q"
+	// accessKeyID := "e8NJMe7BHLQDCZZuWzjS"
+	// secretAccessKey := "MXvyXoJVxj7FyVfDttgo83vIeIZnY1IR2mEP3D8q"
+	accessKeyID := "WO95m9KIyr0Cyfsbg4oP"
+	secretAccessKey := "SCtIF3rSUzyClTkZbSDBJhe3q8IuOkG5pNh9pKu4"
 	useSSL := false
 
 	client, err := minio.New(endpoint, &minio.Options{

@@ -9,7 +9,7 @@ import { useRouter } from 'next/router'
 const index = () => {
   const [rooms, setRooms] = useState<{ id: string; name: string }[]>([])
   const [roomName, setRoomName] = useState('')
-  const { user } = useContext(AuthContext)
+  const { user, setAuthenticated } = useContext(AuthContext)
   const { setConn } = useContext(WebsocketContext)
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -69,32 +69,34 @@ const index = () => {
   }
 
   const logoutHandler = async (e: React.SyntheticEvent) => {
-      e.preventDefault()
+    e.preventDefault()
 
-      try {
-        const res = await fetch(`${API_URL}/logout`, {
-            method: 'GET',
-            // headers: { 'Content-Type': 'application/json' },
-            // body: JSON.stringify({ username, email, password }),
-        });
+    try {
+      const res = await fetch(`${API_URL}/logout`, {
+        method: 'GET',
+        // headers: { 'Content-Type': 'application/json' },
+        // body: JSON.stringify({ username, email, password }),
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          console.log('Logout Success: ', data);
+      if (res.ok) {
+        const data = await res.json();
+        console.log('Logout Success: ', data);
 
-          // Xoá token hoặc session
-          localStorage.removeItem('token'); // Nếu bạn dùng localStorage
-          sessionStorage.removeItem('token'); // Nếu bạn dùng sessionStorage
-          router.push('/login')
+        // Xoá token hoặc session
+        localStorage.removeItem('token'); // Nếu bạn dùng localStorage
+        localStorage.removeItem('user_info'); // Nếu bạn dùng localStorage
+        sessionStorage.removeItem('token'); // Nếu bạn dùng sessionStorage
+        setAuthenticated(false)
+        router.push('/login')
 
-        } else {
-          const errorData = await res.json();
-          setErrorMessage(errorData.message || 'Logout failed. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error during log-out:', error);
-        setErrorMessage('Something went wrong. Please try again later.');
+      } else {
+        const errorData = await res.json();
+        setErrorMessage(errorData.message || 'Logout failed. Please try again.');
       }
+    } catch (error) {
+      console.error('Error during log-out:', error);
+      setErrorMessage('Something went wrong. Please try again later.');
+    }
   }
 
   return (
